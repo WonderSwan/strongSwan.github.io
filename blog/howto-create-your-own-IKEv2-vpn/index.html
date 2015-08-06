@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta charset="UTF-8">
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>strongSwan</title>
+  <meta name="description" content="An IKEv2 VPN Service from strongSwan.Operated by activists and hacktivists in defence of net neutrality, privacy and against censorship.">
+
+    
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/vnd.microsoft.icon">
+<link rel="icon" href="/favicon.ico" type="image/vnd.microsoft.icon">
+
+  <!--Import materialize.css-->
+  <link href="/assets/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="/assets/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="/assets/css/animate.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+
+
+  <body>
+
+    <!-- Header BEGIN -->
+
+
+
+<header>
+	<div class="navbar-fixed">
+		<nav>
+			<div class="nav-wrapper">
+				<div class="col s12">
+					<a href="/" class="brand-logo">strongSwan</a>
+					<!-- <a href="/" class="brand-logo"><img src="img/logo.svg" alt=""></a> -->
+					<a href="#" data-activates="mobile-nav" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+					<div class="right-nav hide-on-med-and-down">
+						<a href="/pricing" class="waves-effect waves-light btn">Geronimo!</a>
+					</div>
+					<ul class="right hide-on-med-and-down">
+						<li><a href="/guides">Guides</a></li>
+						<li><a href="/pricing">Pricing</a></li>
+						<li><a href="/faq">FAQ</a></li>
+					</ul>
+					<ul class="side-nav" id="mobile-nav">
+						<li><a href="/guides" class="waves-effect waves-teal">Guides</a></li>
+						<li><a href="/pricing" class="waves-effect waves-teal">Pricing</a></li>
+						<li><a href="/faq" class="waves-effect waves-teal">FAQ</a></li>
+						<a href="/pricing" class="waves-effect waves-light btn white-text">Geronimo!</a>
+					</ul>
+				</div>
+			</div>
+		</nav>
+	</div>
+</header>
+<!-- Header END -->
+
+        <section class="page">
+  <div class="row">
+    <div class="col s12 m8 l9">
+      <a href="/blog/howto-create-your-own-IKEv2-vpn"><h3 class="base-vertical-margin">IPSEC VPN on Centos 7 with strongSwan<span class="heading-divider"></span></h3></a>
+      <div class="card-panel strongSwan-net darken-1">
+
+      <! -- Blog Post  -->
+        <p><img class="responsive-img" src="/assets/img/blog/post01.jpg"></p>
+        <p><csmall>Jul 9, 2015. | By: Admin</csmall></p>
+
+
+          <p><b>This is a guide on setting up an IPSEC VPN server with CentOS 7 using StrongSwan as the IPsec server and for authentication.</b> It has a detailed explanation with every step. We choose the IPSECP protocol stack because of recent vulnerabilities found in pptpd VPNs and because it is supported on all recent operating systems by default. More than ever, your freedom and privacy when online is under threat. Governments and ISPs want to control what you can and can&#39;t see while keeping a record of everything you do, and even the shady-looking guy lurking around your coffee shop or the airport gate can grab your bank details easier than you may think. A self hosted VPN lets you surf the web the way it was intended: anonymously and without oversight.&lt;!--more--&gt;</p>
+
+<h5>Why a VPN?</h5>
+
+<p>More than ever, your freedom and privacy when online is under threat. Governments and ISPs want to control what you can and can&#39;t see while keeping a record of everything you do, and even the shady-looking guy lurking around your coffee shop or the airport gate can grab your bank details easier than you may think. A self hosted VPN lets you surf the web the way it was intended: anonymously and without oversight.</p>
+
+<p>A VPN (virtual private network) creates a secure, encrypted tunnel through which all of your online data passes back and forth. Any application that requires an internet connection works with this self hosted VPN, including your web browser, email client, and instant messaging program, keeping everything you do online hidden from prying eyes while masking your physical location and giving you unfettered access to any website or web service no matter where you happen to live or travel to.</p>
+
+<p>IPSEC encrypts your IP packets to provide encryption and authentication, so no one can decrypt or forge data between your clients and your server. It also provides a tunnel to send data to the server.</p>
+
+<p>To work trough this tutorial you should have:</p>
+
+<ul>
+<li>1 CentOS 7 server with at least 1 public IP address and root access</li>
+<li>1 (or more) clients running an OS that support IPsec IKEv2 vpns (Ubuntu, Mac OS, Windows 7+, Android 4+).</li>
+<li>Ports 4500/UDP, 500/UDP, 51/UDP and 50/UDP opened in the firewall.</li>
+</ul>
+
+<p>I do all the steps as the root user. You should do to, but only via * -i* or * su -*.</p>
+
+<h5>No L2TP?</h5>
+
+<p>The previous tutorials all used L2TP to set up the VPN tunnel and use IPSEC only for the encryption. With the IKEv2 protocol and recent operating systems (like OS X 10.8+, Android 4+, iOS 6+ and Windows 7+) supporting IKEv2 we can also use IPSEC to set up the tunnel, before we used IPSEC to do that.</p>
+
+<p>This VPN will therefore not work out of the box on older operating systems. See my other tutorials with L2TP on how to do that.</p>
+
+<h5>Overview</h5>
+
+<p>The tutorial consists out of the following steps:</p>
+
+<ul>
+<li>Install packages</li>
+<li>Generate certificates</li>
+<li>Configure IPSEC</li>
+<li>Configure Firewall</li>
+</ul>
+
+<p>Android and Windows client configuration is covered at the end of the tutorial.</p>
+
+<h5>Install EPEL 7:</h5>
+
+<p>Strongswan packages are available in the EPEL. The CentOS/RHEL repo&#39;s only ship Libreswan, which is not what we&#39;ll use in this tutorial. You can read more about the EPEL here: <a href="https://fedoraproject.org/wiki/EPEL">https://fedoraproject.org/wiki/EPEL</a>, packages can be found here: <a href="http://ftp.nluug.nl/pub/os/Linux/distr/fedora-epel/7/x86_64/repoview/epel-release.html">http://ftp.nluug.nl/pub/os/Linux/distr/fedora-epel/7/x86_64/repoview/epel-release.html</a></p>
+
+<p>Install and enable the EPEL using Yum:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">yum install http://ftp.nluug.nl/pub/os/Linux/distr/fedora-epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+</code></pre></div>
+<h5>Install Strongswan</h5>
+
+<p>After the EPEL is enabled we can install StrongSwan. StrongSwan is a descendant of FreeS/WAN, just like Openswan or Libreswan. Strongswan however has a very active community and is actively developed, whereas the other ones are less. You can read more about Strongswan on wikipedia or <a href="https://strongswan.org/">their website</a>.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">yum install strongswan
+</code></pre></div>
+<h5>Certificates</h5>
+
+<p>The VPN server will identify itself with a certificate to the clients. The clients can use a certificate to authenticate themself, this tutorial however keeps it simple and sets up username and password authentication as well.</p>
+
+<p>On Android with the StrongSwan Application you can just import the <code>.p12</code> we are going to create later on. On Windows 7, we&#39;ll use <code>EAP</code> to configure a username and password for our client.</p>
+
+<p>You might want to install <code>haveged</code> to speed up the key generation process:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">yum install haveged
+systemctl <span class="nb">enable </span>haveged
+systemctl start haveged
+</code></pre></div>
+<p>Haveged provides a constant source of entropy and randomness.</p>
+
+<p>Start by creating a self singed root CA. Create a private key:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">cd</span> /etc/strongswan
+strongswan pki --gen --type rsa --size <span class="m">4096</span> --outform der &gt; ipsec.d/private/strongswanKey.der
+chmod <span class="m">600</span> ipsec.d/private/strongswanKey.der
+</code></pre></div>
+<p>Next generate a self signed root CA certificate:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">strongswan pki --self --ca --lifetime <span class="m">3650</span> --in ipsec.d/private/strongswanKey.der --type rsa --dn <span class="s2">&quot;C=NL, O=Example Company, CN=strongSwan Root CA&quot;</span> --outform der &gt; ipsec.d/cacerts/strongswanCert.der
+</code></pre></div>
+<p>You can view the certificate properties with the following command:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">strongswan  pki --print --in ipsec.d/cacerts/strongswanCert.der
+</code></pre></div>
+<p>Example output:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">cert:      X509
+subject:  <span class="s2">&quot;C=NL, O=Example Company, CN=strongSwan Root CA&quot;</span>
+issuer:   <span class="s2">&quot;C=NL, O=Example Company, CN=strongSwan Root CA&quot;</span>
+validity:  not before Dec <span class="m">24</span> 07:40:57 2014, ok
+           not after  Dec <span class="m">21</span> 07:40:57 2024, ok <span class="o">(</span>expires in <span class="m">3649</span> days<span class="o">)</span>
+serial:    74:3b:96:ab:4c:14:1d:78
+flags:     CA CRLSign self-signed
+subjkeyId: d8:fb:1f:ae:15:7c:02:4c:d7:95:bc:dd:9c:40:e4:db:33:38:8a:b4
+pubkey:    RSA <span class="m">4096</span> bits
+keyid:     c6:3a:c8:2e:31:cf:12:aa:67:4f:7c:da:65:3c:4f:84:bc:69:46:02
+subjkey:   d8:fb:1f:ae:15:7c:02:4c:d7:95:bc:dd:9c:40:e4:db:33:38:8a:b4
+</code></pre></div>
+<p>Generate the VPN Host key. This is the keypair the VPN server host will use to authenticate itself to clietns. First the private key:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">strongswan pki --gen --type rsa --size <span class="m">2048</span> --outform der &gt; ipsec.d/private/vpnHostKey.der
+chmod <span class="m">600</span> ipsec.d/private/vpnHostKey.der
+</code></pre></div>
+<p>The public key:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">strongswan pki --pub --in ipsec.d/private/vpnHostKey.der --type rsa <span class="p">|</span> strongswan pki --issue --lifetime <span class="m">730</span> --cacert ipsec.d/cacerts/strongswanCert.der --cakey ipsec.d/private/strongswanKey.der --dn <span class="s2">&quot;C=NL, O=Example Company, CN=vpn.example.org&quot;</span> --san vpn.example.com --san vpn.example.net --san 213.187.243.183  --san @213.187.243.183 --flag serverAuth --flag ikeIntermediate --outform der &gt; ipsec.d/certs/vpnHostCert.der
+</code></pre></div>
+<p>The domain name or IP address of your VPN server, which is later entered in the clients connection properties, MUST be contained either in the subject Distinguished Name (CN) and/or in a subject Alternative Name (<code>--san</code>). If this does not match the clients will fail to connect.</p>
+
+<p>The built in Windows 7 VPN client needs the <code>serverAuth</code> extended key usage flag in your host certificate as shown above, or the client will refuse to connect. In addition, OS X 10.7.3 or older requires the <code>ikeIntermediate</code> flag, which we also add here.</p>
+
+<p>We add the IP address twice, one with an <code>@</code> in front so that it gets added as an <code>subjectAltName</code> of the <code>dNSName</code> type and one of the <code>iPAddess</code> type.</p>
+
+<p>Let&#39;s view the certificate:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">strongswan pki --print --in ipsec.d/certs/vpnHostCert.der
+</code></pre></div>
+<p>Output:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">cert:      X509
+subject:  <span class="s2">&quot;C=NL, O=Example Company, CN=vpn.example.org&quot;</span>
+issuer:   <span class="s2">&quot;C=NL, O=Example Company, CN=strongSwan Root CA&quot;</span>
+validity:  not before Dec <span class="m">24</span> 12:14:00 2014, ok
+           not after  Dec <span class="m">23</span> 12:14:00 2016, ok <span class="o">(</span>expires in <span class="m">729</span> days<span class="o">)</span>
+serial:    70:27:27:e3:58:d1:a7:d3
+altNames:  vpn.example.com, vpn.example.net, 213.187.243.183, 213.187.243.183
+flags:     serverAuth iKEIntermediate
+authkeyId: d1:72:26:da:6b:50:e0:4d:89:f8:39:f9:7f:b9:97:48:04:df:2b:00
+subjkeyId: 2b:03:2a:36:d5:6e:37:69:b8:79:0f:36:35:b6:b4:3d:b2:76:9d:2e
+pubkey:    RSA <span class="m">2048</span> bits
+keyid:     60:af:b0:25:bc:19:eb:b6:b4:4c:b0:f9:9f:ee:75:06:78:94:22:6f
+subjkey:   2b:03:2a:36:d5:6e:37:69:b8:79:0f:36:35:b6:b4:3d:b2:76:9d:2e
+</code></pre></div>
+<p>You can also use OpenSSL to see the contents, here is an excerpt:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">openssl x509 -inform DER -in ipsec.d/certs/vpnHostCert.der -noout -text
+</code></pre></div>
+<p>Output:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">Certificate:
+            Data:
+                Version: <span class="m">3</span> <span class="o">(</span>0x2<span class="o">)</span>
+                Serial Number: <span class="m">8081471913740838867</span> <span class="o">(</span>0x702727e358d1a7d3<span class="o">)</span>
+            Signature Algorithm: sha1WithRSAEncryption
+                Issuer: <span class="nv">C</span><span class="o">=</span>NL, <span class="nv">O</span><span class="o">=</span>Example Company, <span class="nv">CN</span><span class="o">=</span>strongSwan Root CA
+                Validity
+                    Not Before: Dec <span class="m">24</span> 11:14:00 <span class="m">2014</span> GMT
+                    Not After : Dec <span class="m">23</span> 11:14:00 <span class="m">2016</span> GMT
+                Subject: <span class="nv">C</span><span class="o">=</span>NL, <span class="nv">O</span><span class="o">=</span>Example Company, <span class="nv">CN</span><span class="o">=</span>vpn.example.org
+                Subject Public Key Info:
+                    Public Key Algorithm: rsaEncryption
+                        Public-Key: <span class="o">(</span><span class="m">2048</span> bit<span class="o">)</span>
+        <span class="o">[</span>...<span class="o">]</span>
+        X509v3 extensions:
+        X509v3 Authority Key Identifier: 
+            keyid:D1:72:26:DA:6B:50:E0:4D:89:F8:39:F9:7F:B9:97:48:04:DF:2B:00
+
+        X509v3 Subject Alternative Name: 
+            DNS:vpn.example.com, DNS:vpn.example.net, IP Address:213.187.243.183, DNS:213.187.243.183
+        X509v3 Extended Key Usage:
+            TLS Web Server Authentication, 1.3.6.1.5.5.8.2.2
+        <span class="o">[</span>...<span class="o">]</span>
+</code></pre></div>
+<p>The private key (<code>/etc/openswan/ipsec.d/private/strongswanKey.der</code>) of the CA should be moved somewhere safe, possibly to a special signing host without access to the Internet. Theft of this master signing key would completely compromise your public key infrastructure. Use it only to generate client certificates when needed.</p>
+
+<h6>Client certificate</h6>
+
+<p>Any client will require a personal certificate in order to use the VPN. The process is analogous to generating a host certificate, except that we identify a client certificate by the clients e-mail address rather than a hostname.</p>
+
+<p>We create a keypair for the example user &quot;John&quot;.</p>
+
+<p>Private key:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">cd</span> /etc/strongswan/
+strongswan pki --gen --type rsa --size <span class="m">2048</span> --outform der &gt; ipsec.d/private/JohnKey.der
+chmod <span class="m">600</span> ipsec.d/private/JohnKey.der
+</code></pre></div>
+<p>Public key:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">strongswan pki --pub --in ipsec.d/private/JohnKey.der --type rsa <span class="p">|</span> strongswan pki --issue --lifetime <span class="m">730</span> --cacert ipsec.d/cacerts/strongswanCert.der --cakey ipsec.d/private/strongswanKey.der --dn <span class="s2">&quot;C=NL, O=Example Company, CN=john@example.org&quot;</span> --san <span class="s2">&quot;john@example.org&quot;</span> --san <span class="s2">&quot;john@example.net&quot;</span> --outform der &gt; ipsec.d/certs/JohnCert.der
+</code></pre></div>
+<p>A VPN client needs a client certificate, its private key, and the signing CA certificate. The most convenient way is to put everything in a single signed PKCS#12 file and export it with a paraphrase.</p>
+
+<p>Convert the required keys to PEM formt before converting to a .p12:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">cd</span> /etc/strongswan/
+
+openssl rsa -inform DER -in ipsec.d/private/JohnKey.der -out ipsec.d/private/JohnKey.pem -outform PEM
+
+openssl x509 -inform DER -in ipsec.d/certs/JohnCert.der -out ipsec.d/certs/JohnCert.pem -outform PEM
+
+openssl x509 -inform DER -in ipsec.d/cacerts/strongswanCert.der -out ipsec.d/cacerts/strongswanCert.pem -outform PEM
+</code></pre></div>
+<p>Construct the .p12:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">openssl pkcs12 -export  -inkey ipsec.d/private/JohnKey.pem -in ipsec.d/certs/JohnCert.pem -name <span class="s2">&quot;John&#39;s VPN Certificate&quot;</span>  -certfile ipsec.d/cacerts/strongswanCert.pem -caname <span class="s2">&quot;strongSwan Root CA&quot;</span> -out John.p12
+</code></pre></div>
+<p>Enter a password twice, then you have a .p12. You can send <code>John.p12</code> and its export paraphrase to the person whos going to install it onto the client. In some cases (iOS for example) you have to separately include the CA certificate <code>ipsec.d/cacerts/strongswanCert.pem</code>.</p>
+
+<p>Transport this <code>John.p12</code> file and the password over seperate channels to a client.</p>
+
+<p>If you need any more user certificate, repeat the above steps with other user data.</p>
+
+<h5>IPSEC Configuration</h5>
+
+<p>The main ipsec configuration file is located in /etc/strongswan. We are going to edit it:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">vim /etc/strongswan/ipsec.conf
+</code></pre></div>
+<p>Place the following contents:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># ipsec.conf - strongSwan IPsec configuration file</span>
+
+config setup
+    <span class="nv">charondebug</span><span class="o">=</span><span class="s2">&quot;ike 2, knl 2, cfg 2, net 2, esp 2, dmn 2,  mgr 2&quot;</span>
+
+conn %default
+    <span class="nv">keyexchange</span><span class="o">=</span>ikev2
+    <span class="nv">ike</span><span class="o">=</span>aes128-sha256-ecp256,aes256-sha384-ecp384,aes128-sha256-modp2048,aes128-sha1-modp2048,aes256-sha384-modp4096,aes256-sha256-modp4096,aes256-sha1-modp4096,aes128-sha256-modp1536,aes128-sha1-modp1536,aes256-sha384-modp2048,aes256-sha256-modp2048,aes256-sha1-modp2048,aes128-sha256-modp1024,aes128-sha1-modp1024,aes256-sha384-modp1536,aes256-sha256-modp1536,aes256-sha1-modp1536,aes256-sha384-modp1024,aes256-sha256-modp1024,aes256-sha1-modp1024!
+    <span class="nv">esp</span><span class="o">=</span>aes128gcm16-ecp256,aes256gcm16-ecp384,aes128-sha256-ecp256,aes256-sha384-ecp384,aes128-sha256-modp2048,aes128-sha1-modp2048,aes256-sha384-modp4096,aes256-sha256-modp4096,aes256-sha1-modp4096,aes128-sha256-modp1536,aes128-sha1-modp1536,aes256-sha384-modp2048,aes256-sha256-modp2048,aes256-sha1-modp2048,aes128-sha256-modp1024,aes128-sha1-modp1024,aes256-sha384-modp1536,aes256-sha256-modp1536,aes256-sha1-modp1536,aes256-sha384-modp1024,aes256-sha256-modp1024,aes256-sha1-modp1024,aes128gcm16,aes256gcm16,aes128-sha256,aes128-sha1,aes256-sha384,aes256-sha256,aes256-sha1!
+    <span class="nv">dpdaction</span><span class="o">=</span>clear
+    <span class="nv">dpddelay</span><span class="o">=</span>300s
+    <span class="nv">rekey</span><span class="o">=</span>no
+    <span class="nv">left</span><span class="o">=</span>%any
+    <span class="nv">leftsubnet</span><span class="o">=</span>0.0.0.0/0
+    <span class="nv">leftcert</span><span class="o">=</span>vpnHostCert.der
+    <span class="nv">right</span><span class="o">=</span>%any
+    <span class="nv">rightdns</span><span class="o">=</span>8.8.8.8,8.8.4.4
+    <span class="nv">rightsourceip</span><span class="o">=</span>10.42.42.0/24
+
+conn IPSec-IKEv2
+    <span class="nv">keyexchange</span><span class="o">=</span>ikev2
+    <span class="nv">auto</span><span class="o">=</span>add
+
+conn IPSec-IKEv2-EAP
+    <span class="nv">also</span><span class="o">=</span><span class="s2">&quot;IPSec-IKEv2&quot;</span>
+    <span class="nv">rightauth</span><span class="o">=</span>eap-mschapv2
+    <span class="nv">rightauthby2</span><span class="o">=</span>pubkey
+    <span class="nv">rightsendcert</span><span class="o">=</span>never
+    <span class="nv">eap_identity</span><span class="o">=</span>%any
+
+conn CiscoIPSec
+    <span class="nv">keyexchange</span><span class="o">=</span>ikev1
+    <span class="nv">forceencaps</span><span class="o">=</span>yes
+    <span class="nv">authby</span><span class="o">=</span>xauthrsasig
+    <span class="nv">xauth</span><span class="o">=</span>server
+    <span class="nv">auto</span><span class="o">=</span>add
+</code></pre></div>
+<p>This configuration has settings for three types of VPN services: IKEv2 + RSA certificate, IKEv2 + EAP, and IKEv1 + Xauth RSA, thus providing compatibility for a wide range of IPsec clients.</p>
+
+<p>iOS clients below iOS 8 need to use <code>IKEv1</code>. Apple added support for IKEv2 in iOS 8, but it needs to be configured using a <a href="https://wiki.strongswan.org/projects/strongswan/wiki/AppleIKEv2Profile">custom configuration profile</a>.</p>
+
+<p>OS X does not support IKEv2 (not on 10.10 or lower) so they need to use ikev1 as well.</p>
+
+<p>Android 4+ and Windows 7+ support IKEv2 and can use that.</p>
+
+<p>Clients will get the Google DNS servers and an IP address in the <code>10.42.42.0/24</code> range. We use a strong ciphersuite.</p>
+
+<p>The <code>leftcert=vpnHostCert.der</code> expands to the path <code>/etc/strongswan/ipsec.d/certs/vpnHostCert.der</code>.</p>
+
+<h5>VPN user accounts and secrets</h5>
+
+<p>The users are configured in the /etc/strongswan/ipsec.secrets file.</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">vim /etc/strongswan/ipsec.secrets
+</code></pre></div>
+<p>Example content:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">: RSA vpnHostKey.der
+
+alice : EAP <span class="s2">&quot;YzCgnveYuL429fH&quot;</span> 
+bob : EAP <span class="s2">&quot;E23pOjvW8z248iAp&quot;</span> 
+hipster: XAUTH <span class="s2">&quot;xauth_ikev1_example_password&quot;</span>
+</code></pre></div>
+<p>In the example above the RSA private key file vpnHostKey.der stored in the <code>/etc/openswan/ipsec.d/private/</code> directory is not protected by symmetric encryption (a password).</p>
+
+<p>The format of the EAP MSCHAPv2 user credentials is:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">[&lt;domain&gt;\]&lt;username&gt; : EAP &quot;&lt;plaintext password&gt;&quot; 
+</code></pre></div>
+<p>Add as many users as you like there. The first line allows all users with a valid certificate to use the VPN, the other lines allow users without a certificate to login with a username and password. The space between the username, the colon (:) and EAP needs to be there.</p>
+
+<p>If you have users that need to use IKEv1 with a password and XAUTH you need to seperately configure those. Note that certificate authentication is prefersed, those users do not have to be configured there.</p>
+
+<p>If you need to generate password, OpenSSL can help you there:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"> openssl rand -base64 24
+ jzHMIj6sqBbSI6LFmXINrwZWkXG9O8GW
+</code></pre></div>
+<h5>Firewall &amp; Packet Routing</h5>
+
+<p>Configure the firewall to allow the below ports on the VM. CentOS 7 uses <code>firewalld</code> to configure <code>iptables</code>, so lets use that. Add the required ports to the <code>dmz</code> zone, make sure the server NAT&#39;s our traffic and activate that zone:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">firewall-cmd --zone<span class="o">=</span>dmz --permanent --add-rich-rule<span class="o">=</span><span class="s1">&#39;rule protocol value=&quot;esp&quot; accept&#39;</span> <span class="c"># ESP (the encrypted data packets)</span>
+firewall-cmd --zone<span class="o">=</span>dmz --permanent --add-rich-rule<span class="o">=</span><span class="s1">&#39;rule protocol value=&quot;ah&quot; accept&#39;</span> <span class="c"># AH (authenticated headers)</span>
+firewall-cmd --zone<span class="o">=</span>dmz --permanent --add-port<span class="o">=</span>500/udp <span class="c">#IKE  (security associations)</span>
+firewall-cmd --zone<span class="o">=</span>dmz --permanent --add-port<span class="o">=</span>4500/udp <span class="c"># IKE NAT Traversal (IPsec between natted devices)</span>
+firewall-cmd --permanent --add-service<span class="o">=</span><span class="s2">&quot;ipsec&quot;</span>
+firewall-cmd --zone<span class="o">=</span>dmz --permanent --add-masquerade
+firewall-cmd --permanent --set-default-zone<span class="o">=</span>dmz
+firewall-cmd --reload
+firewall-cmd --list-all
+</code></pre></div>
+<p>Configure sysctl to allow packet forwarding:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">vim /etc/sysctl.conf
+</code></pre></div>
+<p>Add the following:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c"># VPN</span>
+net.ipv4.ip_forward <span class="o">=</span> 1
+net.ipv4.conf.all.accept_redirects <span class="o">=</span> 0
+net.ipv4.conf.all.send_redirects <span class="o">=</span> 0
+</code></pre></div>
+<p>Apply with:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">sysctl -p
+</code></pre></div>
+<p>(Or apply with a reboot)</p>
+
+<h5>Start the VPN</h5>
+
+<p>All the configuration on the server is now done. Enable the VPN at startup:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">systemctl <span class="nb">enable </span>strongswan
+</code></pre></div>
+<p>And start it:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">systemctl start strongswan
+</code></pre></div>
+<p>If you get errors like below:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">connecting to <span class="s1">&#39;unix:///var/run/charon.ctl&#39;</span> failed: Permission denied
+failed to connect to stroke socket <span class="s1">&#39;unix:///var/run/charon.ctl&#39;</span>
+</code></pre></div>
+<p>You can use the below command to start the VPN if it does not work correctly:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">strongswan restart
+</code></pre></div>
+<p>The following command can be used to see if there are clients connected:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">strongswan status
+</code></pre></div>
+<p>With one (android) client connected, it looks like this:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">Security Associations <span class="o">(</span><span class="m">1</span> up, <span class="m">0</span> connecting<span class="o">)</span>:
+ IPSec-IKEv2<span class="o">[</span>4<span class="o">]</span>: ESTABLISHED <span class="m">20</span> seconds ago, 213.187.243.183<span class="o">[</span><span class="nv">C</span><span class="o">=</span>NL, <span class="nv">O</span><span class="o">=</span>Example Company, <span class="nv">CN</span><span class="o">=</span>vpn.example.org<span class="o">]</span>...198.44.82.171<span class="o">[</span><span class="nv">C</span><span class="o">=</span>NL, <span class="nv">O</span><span class="o">=</span>Example Company, <span class="nv">CN</span><span class="o">=</span>john@example.org<span class="o">]</span>
+ IPSec-IKEv2<span class="o">{</span>2<span class="o">}</span>:  INSTALLED, TUNNEL, ESP in UDP SPIs: c6eadabb_i 58998789_o
+ IPSec-IKEv2<span class="o">{</span>2<span class="o">}</span>:   0.0.0.0/0 <span class="o">===</span> 10.42.42.1/32
+</code></pre></div>
+<p><a href="https://raymii.org/s/tutorials/IPSEC_vpn_with_CentOS_7.html">https://raymii.org/s/tutorials/IPSEC_vpn_with_CentOS_7.html</a></p>
+
+
+          <div class="spacing"></div>
+
+<!--<div class="PageNavigation">
+  
+    <a class="prev" href="/blog/how-to-resolve-mtu-issue-with-ipsec-tunnel">&laquo; How to resolve MTU issue with ipsec tunnel</a>
+  
+  
+    <a class="next" href="/blog/ikev2-nat-keepalive-interval">Finding the optimal NAT Keepalive interval &raquo;</a>
+  
+</div> -->
+
+      </div> <!-- /card-panel --> 
+    </div><!-- /col -->
+
+
+      <div class="col hide-on-small-only m4 l3 right">
+    <div class="blogright"></div>
+    <h5>Subscribe</h5>
+    <div class="hline"></div>
+        <p>
+            <p class="rss-subscribe">Subscribe to this blog <a href="/feed.xml">via RSS</a>.</p>
+        </p>
+
+    <div class="spacing"></div>
+    <h5>Categories</h5>
+    <div class="hline"></div>
+      <ul class="collection">
+    
+
+        <p>
+            <a href="/category/#guides"><i class="fa fa-angle-right"></i> Guides</a>
+            <span class="new badge">7</span>
+        </p>
+    
+
+        <p>
+            <a href="/category/#mtu"><i class="fa fa-angle-right"></i> Mtu</a>
+            <span class="new badge">1</span>
+        </p>
+    
+
+        <p>
+            <a href="/category/#ipsec"><i class="fa fa-angle-right"></i> Ipsec</a>
+            <span class="new badge">1</span>
+        </p>
+    
+
+        <p>
+            <a href="/category/#strongswan"><i class="fa fa-angle-right"></i> Strongswan</a>
+            <span class="new badge">3</span>
+        </p>
+    
+
+        <p>
+            <a href="/category/#vpn"><i class="fa fa-angle-right"></i> Vpn</a>
+            <span class="new badge">1</span>
+        </p>
+    
+
+        <p>
+            <a href="/category/#setup"><i class="fa fa-angle-right"></i> Setup</a>
+            <span class="new badge">1</span>
+        </p>
+    
+
+        <p>
+            <a href="/category/#nat"><i class="fa fa-angle-right"></i> Nat</a>
+            <span class="new badge">1</span>
+        </p>
+    
+
+        <p>
+            <a href="/category/#keepalive"><i class="fa fa-angle-right"></i> Keepalive</a>
+            <span class="new badge">1</span>
+        </p>
+    
+      </ul>
+
+    <div class="spacing"></div>
+
+    <h5>Recent Posts</h5>
+    <div class="hline"></div>
+        <ul class="popular-posts">
+             
+                <li>
+                    <a href="/blog/ikev2-nat-keepalive-interval"><img src="/assets/img/blog/thumbs/thumb03.png" alt="Popular Post"></a>
+                    <p><a href="/blog/ikev2-nat-keepalive-interval">Finding the optimal NAT Keepalive interval</a></p>
+                <em>Posted on 09 Jul 2015</em>
+            </li>
+             
+                <li>
+                    <a href="/blog/howto-create-your-own-IKEv2-vpn"><img src="/assets/img/blog/thumbs/thumb01.png" alt="Popular Post"></a>
+                    <p><a href="/blog/howto-create-your-own-IKEv2-vpn">IPSEC VPN on Centos 7 with strongSwan</a></p>
+                <em>Posted on 09 Jul 2015</em>
+            </li>
+             
+                <li>
+                    <a href="/blog/how-to-resolve-mtu-issue-with-ipsec-tunnel"><img src="/assets/img/blog/thumbs/thumb02.png" alt="Popular Post"></a>
+                    <p><a href="/blog/how-to-resolve-mtu-issue-with-ipsec-tunnel">How to resolve MTU issue with ipsec tunnel</a></p>
+                <em>Posted on 08 Jul 2015</em>
+            </li>
+             
+        </ul>
+
+</div> 
+
+
+  </div> <!-- /row -->    
+</section> 
+    
+    
+    
+    
+     
+
+    <!-- FOOTER BEGIN -->    
+  <footer class="page-footer z-depth-1 strongSwan-net darken-1">
+    <div class="container">
+      <div class="row">
+	  
+	  
+        <div class="col l2 m12 s12">
+          <ul>
+			<a href="/" class="strongSwan-net-text text-pink-2">root@network:~#<span class="Command-Line">▐</span></a>
+          </ul>
+        </div>
+		
+        <div class="col l2 m4 s4">
+          <ul>
+            <li><a class="strongSwan-net-text text-pink-2" href="/faq">FAQ</a></li>
+            <li><a class="strongSwan-net-text text-pink-2" href="/terms">TOS</a></li>
+          </ul>
+        </div>
+		
+        <div class="col l2 m4 s4">
+          <ul>
+            <li><a class="strongSwan-net-text text-darken-2" href="/blog">Blog</a></li>
+            <li><a class="strongSwan-net-text text-pink-2" href="/guides">Guides</a></li>
+          </ul>
+        </div>
+		
+        <div class="col l2 m4 s4">
+          <ul>
+            <li><a class="strongSwan-net-text text-pink-2" href="/pricing">Pricing</a></li>
+            <li><a class="strongSwan-net-text text-pink-2" href="/privacy">Privacy</a></li>
+          </ul>
+        </div>
+		
+        <div class="col l2 m6 s6">
+          <ul>
+            <li class="strongSwan-net-text text-darken-2">Connect</li>
+            <li><a class="strongSwan-net-text text-pink-2" href="mailto:Info@strongSwan.Net"> Info@strongSwan.Net</a></li>
+          </ul>
+        </div>
+		
+        <div class="col l2 m6 s6 right-align">
+          <ul>
+          <a href="https://plus.google.com/u/0/communities/105410452791176752404"><img src="/assets/img/google-plus.png"></a>
+          </ul>
+        </div>
+		
+		
+      </div>
+    </div>
+	
+	
+	
+	
+    <div class="footer-copyright">
+      <div class="container center-align strongSwan-net-text text-pink-2">
+        <h6>strongSwan.net © 2015</h6>
+      </div>
+    </div>
+  </footer>
+<!-- FOOTER END -->
+    <!--Import jQuery before materialize.js-->
+  <script src="/assets/js/jquery-2.1.1.min.js"></script>
+  <script src="/assets/js/materialize.min.js"></script>
+  
+<!--DongHuaXiaoGuo-->
+	<script src="/assets/js/wow.min.js"></script>
+	<script type="text/javascript">
+  wow = new WOW(
+    {
+      boxClass:     'wow',      // default
+      animateClass: 'animated', // default
+      offset:       0,          // default
+      mobile:       true,       // default
+      live:         true        // default
+    }
+  )
+new WOW().init();
+</script>
+
+
+<!--TouMingTouBu-->
+
+        <script type="text/javascript">
+$(window).scroll(function(){
+
+   var scroll = $(window).scrollTop();                
+      
+   if (scroll > 0 ) {
+       $('nav').addClass('scroll');
+       $('nav a').addClass('scroll');
+       $('nav').addClass('scroll');
+   }
+  
+    if (scroll <= 0 ) {
+      $('nav').removeClass('scroll');
+      $('nav a').removeClass('scroll');
+    }
+  
+});
+// TouBuJieshu
+</script>
+ 
+  
+  
+
+<!--scrollbar BianKuang-->
+<script src="/assets/js/jquery.nicescroll.min.js"></script>
+<script>
+//nicescroll
+$(document).ready(
+    function ($) {
+        if($(window).width()>700)
+        {
+	$("html").niceScroll({cursorborder:"",cursorborderradius:"2px",cursorcolor:"#26a69a",cursorfixedheight:64});
+  }
+    }
+);
+</script>
+
+
+<!--Floating-Fixed table of contents-->
+<script>
+$(document).ready(function(){
+if ($('nav').length) {
+      $('.tabs-wrapper').pushpin({ top: $('nav').height() });
+    }
+    else {
+      $('.tabs-wrapper').pushpin({ top: 0 });
+    }
+});
+</script>
+
+
+  </body>
+
+</html>
