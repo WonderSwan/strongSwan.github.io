@@ -4,10 +4,10 @@
     <title>strongSwan.Net</title>
     <description>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
 </description>
-    <link>http://strongSwan.net/</link>
-    <atom:link href="http://strongSwan.net/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 06 Aug 2015 20:23:24 +0800</pubDate>
-    <lastBuildDate>Thu, 06 Aug 2015 20:23:24 +0800</lastBuildDate>
+    <link>https://strongSwan.net/</link>
+    <atom:link href="https://strongSwan.net/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Thu, 27 Aug 2015 07:04:46 +0800</pubDate>
+    <lastBuildDate>Thu, 27 Aug 2015 07:04:46 +0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -55,8 +55,8 @@ Failed with timeout
 &lt;p&gt;&lt;a href=&quot;https://www.zeitgeist.se/2013/11/27/the-optimal-nat-keepalive-interval/&quot;&gt;https://www.zeitgeist.se/2013/11/27/the-optimal-nat-keepalive-interval/&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Thu, 09 Jul 2015 00:54:46 +0800</pubDate>
-        <link>http://strongSwan.net/blog/ikev2-nat-keepalive-interval</link>
-        <guid isPermaLink="true">http://strongSwan.net/blog/ikev2-nat-keepalive-interval</guid>
+        <link>https://strongSwan.net/blog/ikev2-nat-keepalive-interval</link>
+        <guid isPermaLink="true">https://strongSwan.net/blog/ikev2-nat-keepalive-interval</guid>
         
         
         <category>blog</category>
@@ -388,8 +388,8 @@ failed to connect to stroke socket &lt;span class=&quot;s1&quot;&gt;&amp;#39;uni
 &lt;p&gt;&lt;a href=&quot;https://raymii.org/s/tutorials/IPSEC_vpn_with_CentOS_7.html&quot;&gt;https://raymii.org/s/tutorials/IPSEC_vpn_with_CentOS_7.html&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Thu, 09 Jul 2015 00:54:46 +0800</pubDate>
-        <link>http://strongSwan.net/blog/howto-create-your-own-IKEv2-vpn</link>
-        <guid isPermaLink="true">http://strongSwan.net/blog/howto-create-your-own-IKEv2-vpn</guid>
+        <link>https://strongSwan.net/blog/howto-create-your-own-IKEv2-vpn</link>
+        <guid isPermaLink="true">https://strongSwan.net/blog/howto-create-your-own-IKEv2-vpn</guid>
         
         
         <category>blog</category>
@@ -479,8 +479,8 @@ failed to connect to stroke socket &lt;span class=&quot;s1&quot;&gt;&amp;#39;uni
 &lt;p&gt;&lt;a href=&quot;https://www.zeitgeist.se/2013/11/26/mtu-woes-in-ipsec-tunnels-how-to-fix/&quot;&gt;https://www.zeitgeist.se/2013/11/26/mtu-woes-in-ipsec-tunnels-how-to-fix/&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Wed, 08 Jul 2015 00:54:46 +0800</pubDate>
-        <link>http://strongSwan.net/blog/how-to-resolve-mtu-issue-with-ipsec-tunnel</link>
-        <guid isPermaLink="true">http://strongSwan.net/blog/how-to-resolve-mtu-issue-with-ipsec-tunnel</guid>
+        <link>https://strongSwan.net/blog/how-to-resolve-mtu-issue-with-ipsec-tunnel</link>
+        <guid isPermaLink="true">https://strongSwan.net/blog/how-to-resolve-mtu-issue-with-ipsec-tunnel</guid>
         
         
         <category>blog</category>
@@ -589,8 +589,8 @@ the &lt;strong&gt;Mobility&lt;/strong&gt; tick.&lt;/p&gt;
 &lt;p&gt;If everything goes smoothly, you should be connected to the VPN.&lt;/p&gt;
 </description>
         <pubDate>Fri, 26 Jun 2015 00:54:46 +0800</pubDate>
-        <link>http://strongSwan.net/guides/</link>
-        <guid isPermaLink="true">http://strongSwan.net/guides/</guid>
+        <link>https://strongSwan.net/guides/</link>
+        <guid isPermaLink="true">https://strongSwan.net/guides/</guid>
         
         
         <category>guides</category>
@@ -635,8 +635,8 @@ Hit &lt;strong&gt;Save&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;img class=&quot;responsive-img&quot; src=&quot;/assets/img/guides/windowsphone/step9.png&quot;&gt;  &lt;/p&gt;
 </description>
         <pubDate>Tue, 16 Jun 2015 00:55:46 +0800</pubDate>
-        <link>http://strongSwan.net/guides/windows-phone</link>
-        <guid isPermaLink="true">http://strongSwan.net/guides/windows-phone</guid>
+        <link>https://strongSwan.net/guides/windows-phone</link>
+        <guid isPermaLink="true">https://strongSwan.net/guides/windows-phone</guid>
         
         
         <category>guides</category>
@@ -699,8 +699,8 @@ Click on nm-applet -&amp;gt; VPN Connections -&amp;gt; Configure VPN...&lt;/p&gt
 &lt;p&gt;Hoo-ha!&lt;/p&gt;
 </description>
         <pubDate>Tue, 16 Jun 2015 00:55:46 +0800</pubDate>
-        <link>http://strongSwan.net/guides/ubuntu-linux</link>
-        <guid isPermaLink="true">http://strongSwan.net/guides/ubuntu-linux</guid>
+        <link>https://strongSwan.net/guides/ubuntu-linux</link>
+        <guid isPermaLink="true">https://strongSwan.net/guides/ubuntu-linux</guid>
         
         
         <category>guides</category>
@@ -721,8 +721,8 @@ Password: Password
 &lt;p&gt;&lt;img class=&quot;responsive-img screens&quot; src=&quot;/assets/img/guides/mac/mac_002.png&quot;&gt;   &lt;/p&gt;
 </description>
         <pubDate>Tue, 16 Jun 2015 00:55:46 +0800</pubDate>
-        <link>http://strongSwan.net/guides/mac</link>
-        <guid isPermaLink="true">http://strongSwan.net/guides/mac</guid>
+        <link>https://strongSwan.net/guides/mac</link>
+        <guid isPermaLink="true">https://strongSwan.net/guides/mac</guid>
         
         
         <category>guides</category>
@@ -741,8 +741,8 @@ Username: Username
 Password: Password
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
         <pubDate>Tue, 16 Jun 2015 00:55:46 +0800</pubDate>
-        <link>http://strongSwan.net/guides/iphone</link>
-        <guid isPermaLink="true">http://strongSwan.net/guides/iphone</guid>
+        <link>https://strongSwan.net/guides/iphone</link>
+        <guid isPermaLink="true">https://strongSwan.net/guides/iphone</guid>
         
         
         <category>guides</category>
@@ -816,8 +816,8 @@ There is no need to change any &amp;#39;Advanced&amp;#39; configurations.
 &lt;p&gt;If everything goes smoothly, you should be connected to the VPN.&lt;/p&gt;
 </description>
         <pubDate>Tue, 16 Jun 2015 00:55:46 +0800</pubDate>
-        <link>http://strongSwan.net/guides/blackberry</link>
-        <guid isPermaLink="true">http://strongSwan.net/guides/blackberry</guid>
+        <link>https://strongSwan.net/guides/blackberry</link>
+        <guid isPermaLink="true">https://strongSwan.net/guides/blackberry</guid>
         
         
         <category>guides</category>
@@ -888,8 +888,8 @@ and we’ll use the client and CA certificates we just installed. &lt;/p&gt;
 &lt;p&gt;Click &lt;strong&gt;Disconnect&lt;/strong&gt; to exit VPN connection. &lt;/p&gt;
 </description>
         <pubDate>Tue, 16 Jun 2015 00:55:46 +0800</pubDate>
-        <link>http://strongSwan.net/guides/android</link>
-        <guid isPermaLink="true">http://strongSwan.net/guides/android</guid>
+        <link>https://strongSwan.net/guides/android</link>
+        <guid isPermaLink="true">https://strongSwan.net/guides/android</guid>
         
         
         <category>guides</category>
